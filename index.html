@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiGate - Warehouse Security</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Check - Loading State -->
+        <div id="auth-loading" class="loading-container">
+            <div class="spinner"></div>
+            <p>Checking access...</p>
+        </div>
+
+        <!-- Auth Failed - No Access -->
+        <div id="auth-failed" class="error-container" style="display: none;">
+            <h2>Access Denied</h2>
+            <p>LogiGate is not available for your account.</p>
+            <p>Contact your administrator to enable LogiGate.</p>
+            <button onclick="window.history.back()">Go Back</button>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard" style="display: none;">
+            <!-- Header -->
+            <header class="logigate-header">
+                <div class="header-content">
+                    <!-- Company Logo -->
+                    <div class="company-section">
+                        <img id="company-logo" src="" alt="Company Logo" class="company-logo" onerror="this.style.display='none'">
+                        <h1 id="company-name" class="company-name">Loading...</h1>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="dashboard-main">
+                <!-- Dashboard Title -->
+                <section class="dashboard-intro">
+                    <h2>LogiGate Modules</h2>
+                    <p>Warehouse Security & Manifest Tracking</p>
+                </section>
+
+                <!-- Module Tiles Grid -->
+                <section class="modules-grid">
+                    <!-- Module 1: Outbound Manifest (LIVE) -->
+                    <div class="module-card active" onclick="openModule('outbound-manifest')">
+                        <div class="module-icon">🛡️</div>
+                        <h3>Outbound Manifest</h3>
+                        <p>Track shipments handed over to transporters</p>
+                        <span class="module-status live">● LIVE</span>
+                    </div>
+
+                    <!-- Module 2: Inbound Receipt (FUTURE) -->
+                    <div class="module-card disabled">
+                        <div class="module-icon">📦</div>
+                        <h3>Inbound Receipt</h3>
+                        <p>Log incoming containers and shipments</p>
+                        <span class="module-status coming">Coming Soon</span>
+                    </div>
+
+                    <!-- Module 3: Visitor Management (FUTURE) -->
+                    <div class="module-card disabled">
+                        <div class="module-icon">👥</div>
+                        <h3>Visitor Management</h3>
+                        <p>Check-in/out and visitor tracking</p>
+                        <span class="module-status coming">Coming Soon</span>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="dashboard-footer">
+                <p>&copy; 2026 LogiGate by Arwa Enterprises. All rights reserved.</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Initialize LogiGate Dashboard
+        async function initDashboard() {
+            try {
+                // Check authentication
+                const user = await checkAuth();
+                if (!user) {
+                    showAuthFailed();
+                    return;
+                }
+
+                // Check if user has LogiGate access
+                const hasAccess = await checkLogigateAccess(user.client_id);
+                if (!hasAccess) {
+                    showAuthFailed();
+                    return;
+                }
+
+                // Fetch company info
+                const company = await getCompanyInfo(user.client_id);
+                if (company) {
+                    document.getElementById('company-name').textContent = company.business_name;
+                    document.getElementById('company-logo').src = company.logo_url;
+                }
+
+                // Show dashboard
+                document.getElementById('auth-loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } catch (error) {
+                console.error('Dashboard init error:', error);
+                showAuthFailed();
+            }
+        }
+
+        // Open Module
+        function openModule(moduleName) {
+            if (moduleName === 'outbound-manifest') {
+                window.location.href = 'modules/outbound-manifest.html';
+            }
+        }
+
+        // Show Auth Failed
+        function showAuthFailed() {
+            document.getElementById('auth-loading').style.display = 'none';
+            document.getElementById('auth-failed').style.display = 'block';
+        }
+
+        // Get Company Info from Supabase
+        async function getCompanyInfo(clientId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('clients')
+                    .select('id, business_name, logo_url, client_code')
+                    .eq('id', clientId)
+                    .single();
+
+                if (error) throw error;
+                return data;
+            } catch (error) {
+                console.error('Error fetching company info:', error);
+                return null;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
