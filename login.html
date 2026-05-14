@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiGate Login - Warehouse Security</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #5B4B9E 0%, #3E5BDB 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 420px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5B4B9E;
+            box-shadow: 0 0 0 3px rgba(91, 75, 158, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #cbd5e0;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #5B4B9E 0%, #3E5BDB 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 75, 158, 0.3);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #f56565;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.3s ease-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .divider {
+            margin: 20px 0;
+            text-align: center;
+            font-size: 12px;
+            color: #cbd5e0;
+        }
+
+        .help-text {
+            background: #edf2f7;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .login-title {
+                font-size: 20px;
+            }
+
+            .login-logo {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Header -->
+        <div class="login-header">
+            <div class="login-logo">🛡️</div>
+            <h1 class="login-title">LogiGate</h1>
+            <p class="login-subtitle">Warehouse Security & Manifest Tracking</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="error-message">
+            <strong>Login Failed</strong>
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="login-button" id="login-btn">
+                <div class="login-button-content">
+                    <span class="loading-spinner" id="loading-spinner"></span>
+                    <span id="btn-text">Sign In</span>
+                </div>
+            </button>
+        </form>
+
+        <!-- Help Text -->
+        <div class="divider">OR</div>
+        <div class="help-text">
+            <strong>Demo Credentials:</strong><br>
+            Contact your administrator for access credentials.<br>
+            <br>
+            <strong>Support:</strong><br>
+            Email: connect.arwaenterprises@gmail.com
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p>&copy; 2026 LogiGate by Arwa Enterprises</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://kyktwzwiraipwyglkhva.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5a3R3endpcmFpcHd5Z2xraHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NDYxMzMsImV4cCI6MTg2OTQxNDEzM30.oPZGP3MWZc6kAU4_Kc8t-EX-gZST8h-B2Nt-AqcFPww';
+
+        // Initialize Supabase Client
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================================================
+        // LOGIN HANDLER
+        // ============================================================================
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const btnText = document.getElementById('btn-text');
+            const errorDiv = document.getElementById('error-message');
+
+            // Hide error message
+            errorDiv.classList.remove('show');
+
+            // Disable button & show loading
+            loginBtn.disabled = true;
+            loadingSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Signing in...';
+
+            try {
+                // Step 1: Authenticate with Supabase Auth
+                console.log('Attempting authentication for:', username);
+
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                    email: username, // Try username as email first
+                    password: password
+                });
+
+                if (authError) {
+                    throw new Error('Invalid username or password');
+                }
+
+                if (!authData.session) {
+                    throw new Error('No session created');
+                }
+
+                console.log('Auth successful, session created');
+
+                // Step 2: Fetch user from admin_users table
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('admin_users')
+                    .select('id, username, name, role, client_id, status')
+                    .eq('username', username)
+                    .single();
+
+                if (userError || !userData) {
+                    // If no user in admin_users, cleanup auth and show error
+                    await supabaseClient.auth.signOut();
+                    throw new Error('User not found in system');
+                }
+
+                if (userData.status !== 'active') {
+                    await supabaseClient.auth.signOut();
+                    throw new Error('User account is inactive');
+                }
+
+                console.log('User authenticated:', userData.name);
+
+                // Step 3: Check LogiGate access
+                const { data: clientData, error: clientError } = await supabaseClient
+                    .from('clients')
+                    .select('subscribed_apps')
+                    .eq('id', userData.client_id)
+                    .single();
+
+                if (clientError || !clientData) {
+                    await supabaseClient.auth.signOut();
+                    throw new Error('Client not found');
+                }
+
+                const hasLogigateAccess = clientData.subscribed_apps && 
+                                         clientData.subscribed_apps.includes('logigate');
+
+                if (!hasLogigateAccess) {
+                    await supabaseClient.auth.signOut();
+                    throw new Error('LogiGate is not available for your account');
+                }
+
+                console.log('LogiGate access confirmed');
+
+                // Step 4: Login successful - Redirect to dashboard
+                showSuccess('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Login failed. Please try again.');
+                
+                // Re-enable button
+                loginBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                btnText.textContent = 'Sign In';
+            }
+        }
+
+        // ============================================================================
+        // ERROR HANDLING
+        // ============================================================================
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorDiv.style.background = '#c6f6d5';
+            errorDiv.style.color = '#22543d';
+            errorDiv.style.borderLeftColor = '#48bb78';
+            errorDiv.querySelector('strong').textContent = 'Success';
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        // ============================================================================
+        // CHECK IF ALREADY LOGGED IN
+        // ============================================================================
+
+        async function checkExistingSession() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    console.log('Existing session found, redirecting to dashboard');
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.log('No existing session');
+            }
+        }
+
+        // Check on page load
+        document.addEventListener('DOMContentLoaded', checkExistingSession);
+
+        // Auto-focus on username field
+        document.getElementById('username').focus();
+    </script>
+</body>
+</html>
