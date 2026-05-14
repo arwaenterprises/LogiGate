@@ -1,209 +1,115 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogiGate - Warehouse Security</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <div id="app">
-        <!-- Auth Check - Loading State -->
-        <div id="auth-loading" class="loading-container">
-            <div class="spinner"></div>
-            <p>Checking access...</p>
-        </div>
+// ============================================================================
+// LogiGate Auth Module (DEMO MODE)
+// Uses localStorage session - no Supabase Auth
+// ============================================================================
 
-        <!-- Auth Failed - No Access -->
-        <div id="auth-failed" class="error-container" style="display: none;">
-            <h2>Access Denied</h2>
-            <p>LogiGate is not available for your account.</p>
-            <p>Contact your administrator to enable LogiGate.</p>
-            <button onclick="logout()">Go to Login</button>
-        </div>
+// Supabase Client (for database queries only)
+const SUPABASE_URL = 'https://kyktwzwiraipwyglkhva.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5a3R3endpcmFpcHd5Z2xraHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NDYxMzMsImV4cCI6MTg2OTQxNDEzM30.oPZGP3MWZc6kAU4_Kc8t-EX-gZST8h-B2Nt-AqcFPww';
 
-        <!-- Main Dashboard -->
-        <div id="dashboard" style="display: none;">
-            <!-- Header -->
-            <header class="logigate-header">
-                <div class="header-content">
-                    <!-- Company Logo -->
-                    <div class="company-section">
-                        <img id="company-logo" src="" alt="Company Logo" class="company-logo" onerror="this.style.display='none'">
-                        <h1 id="company-name" class="company-name">Loading...</h1>
-                    </div>
-                    <!-- Logout Button -->
-                    <button class="btn btn-secondary" onclick="logout()" style="margin-left: auto;">Logout</button>
-                </div>
-            </header>
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            <!-- Main Content -->
-            <main class="dashboard-main">
-                <!-- Dashboard Title -->
-                <section class="dashboard-intro">
-                    <h2>LogiGate Modules</h2>
-                    <p>Warehouse Security & Manifest Tracking</p>
-                </section>
+// ============================================================================
+// CHECK AUTHENTICATION (From localStorage session)
+// ============================================================================
 
-                <!-- Module Tiles Grid -->
-                <section class="modules-grid">
-                    <!-- Module 1: Outbound Manifest (LIVE) -->
-                    <div class="module-card active" onclick="openModule('outbound-manifest')">
-                        <div class="module-icon">🛡️</div>
-                        <h3>Outbound Manifest</h3>
-                        <p>Track shipments handed over to transporters</p>
-                        <span class="module-status live">● LIVE</span>
-                    </div>
-
-                    <!-- Module 2: Inbound Receipt (FUTURE) -->
-                    <div class="module-card disabled">
-                        <div class="module-icon">📦</div>
-                        <h3>Inbound Receipt</h3>
-                        <p>Log incoming containers and shipments</p>
-                        <span class="module-status coming">Coming Soon</span>
-                    </div>
-
-                    <!-- Module 3: Visitor Management (FUTURE) -->
-                    <div class="module-card disabled">
-                        <div class="module-icon">👥</div>
-                        <h3>Visitor Management</h3>
-                        <p>Check-in/out and visitor tracking</p>
-                        <span class="module-status coming">Coming Soon</span>
-                    </div>
-                </section>
-            </main>
-
-            <!-- Footer -->
-            <footer class="dashboard-footer">
-                <p>&copy; 2026 LogiGate by Arwa Enterprises. All rights reserved.</p>
-            </footer>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/auth.js"></script>
-    <script>
-        // ============================================================================
-        // INITIALIZE DASHBOARD
-        // ============================================================================
-
-        async function initDashboard() {
-            try {
-                console.log('Initializing LogiGate dashboard...');
-
-                // Step 1: Check if user is authenticated
-                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-
-                if (sessionError || !session) {
-                    console.warn('No active session, redirecting to login');
-                    redirectToLogin();
-                    return;
-                }
-
-                console.log('Session found, checking user...');
-
-                // Step 2: Get current user details
-                const user = await checkAuth();
-                
-                if (!user) {
-                    console.warn('User not authenticated');
-                    redirectToLogin();
-                    return;
-                }
-
-                console.log('User authenticated:', user.name);
-
-                // Step 3: Check LogiGate access
-                const hasAccess = await checkLogigateAccess(user.client_id);
-                
-                if (!hasAccess) {
-                    console.warn('User does not have LogiGate access');
-                    showAuthFailed();
-                    return;
-                }
-
-                console.log('User has LogiGate access');
-
-                // Step 4: Fetch company info
-                const company = await getClientInfo(user.client_id);
-                if (company) {
-                    document.getElementById('company-name').textContent = company.business_name;
-                    if (company.logo_url) {
-                        document.getElementById('company-logo').src = company.logo_url;
-                    }
-                }
-
-                // Step 5: Show dashboard
-                document.getElementById('auth-loading').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-
-                console.log('Dashboard initialized successfully');
-
-            } catch (error) {
-                console.error('Dashboard init error:', error);
-                redirectToLogin();
-            }
+async function checkAuth() {
+    try {
+        const sessionData = localStorage.getItem('logigate_session');
+        
+        if (!sessionData) {
+            console.warn('No session found');
+            return null;
         }
 
-        // ============================================================================
-        // REDIRECT TO LOGIN
-        // ============================================================================
+        const session = JSON.parse(sessionData);
+        return session;
 
-        function redirectToLogin() {
-            console.log('Redirecting to login page...');
-            window.location.href = 'login.html';
+    } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+    }
+}
+
+// ============================================================================
+// CHECK LOGIGATE ACCESS
+// ============================================================================
+
+async function checkLogigateAccess(clientId) {
+    try {
+        const sessionData = localStorage.getItem('logigate_session');
+        
+        if (!sessionData) {
+            return false;
         }
 
-        // ============================================================================
-        // SHOW AUTH FAILED
-        // ============================================================================
+        const session = JSON.parse(sessionData);
+        const subscribedApps = session.subscribed_apps || [];
+        const hasAccess = subscribedApps.includes('logigate');
 
-        function showAuthFailed() {
-            document.getElementById('auth-loading').style.display = 'none';
-            document.getElementById('auth-failed').style.display = 'block';
+        console.log('LogiGate access:', hasAccess);
+        return hasAccess;
+
+    } catch (error) {
+        console.error('Access check error:', error);
+        return false;
+    }
+}
+
+// ============================================================================
+// GET CLIENT INFO
+// ============================================================================
+
+async function getClientInfo(clientId) {
+    try {
+        const sessionData = localStorage.getItem('logigate_session');
+        
+        if (!sessionData) {
+            return null;
         }
 
-        // ============================================================================
-        // LOGOUT
-        // ============================================================================
+        const session = JSON.parse(sessionData);
+        return {
+            id: session.client_id,
+            business_name: session.business_name,
+            logo_url: session.logo_url,
+            subscribed_apps: session.subscribed_apps
+        };
 
-        async function logout() {
-            try {
-                console.log('Logging out...');
-                const { error } = await supabaseClient.auth.signOut();
-                
-                if (error) {
-                    console.error('Logout error:', error);
-                }
+    } catch (error) {
+        console.error('Error fetching client:', error);
+        return null;
+    }
+}
 
-                console.log('User logged out, redirecting to login');
-                redirectToLogin();
+// ============================================================================
+// LOGOUT
+// ============================================================================
 
-            } catch (error) {
-                console.error('Logout error:', error);
-                redirectToLogin();
-            }
-        }
+async function logout() {
+    try {
+        console.log('Logging out...');
+        localStorage.removeItem('logigate_session');
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Logout error:', error);
+        window.location.href = 'index.html';
+    }
+}
 
-        // ============================================================================
-        // OPEN MODULE
-        // ============================================================================
+// ============================================================================
+// GET CURRENT USER
+// ============================================================================
 
-        function openModule(moduleName) {
-            if (moduleName === 'outbound-manifest') {
-                window.location.href = 'modules/outbound-manifest.html';
-            }
-        }
-
-        // ============================================================================
-        // PAGE LOAD
-        // ============================================================================
-
-        document.addEventListener('DOMContentLoaded', initDashboard);
-    </script>
-</body>
-</html>
+async function getCurrentUser() {
+    try {
+        const sessionData = localStorage.getItem('logigate_session');
+        if (!sessionData) return null;
+        
+        const session = JSON.parse(sessionData);
+        return session;
+    } catch (error) {
+        console.error('Get user error:', error);
+        return null;
+    }
+}
