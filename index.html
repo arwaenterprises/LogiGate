@@ -22,7 +22,7 @@
             <h2>Access Denied</h2>
             <p>LogiGate is not available for your account.</p>
             <p>Contact your administrator to enable LogiGate.</p>
-            <button onclick="window.history.back()">Go Back</button>
+            <button onclick="logout()">Go to Login</button>
         </div>
 
         <!-- Main Dashboard -->
@@ -35,6 +35,8 @@
                         <img id="company-logo" src="" alt="Company Logo" class="company-logo" onerror="this.style.display='none'">
                         <h1 id="company-name" class="company-name">Loading...</h1>
                     </div>
+                    <!-- Logout Button -->
+                    <button class="btn btn-secondary" onclick="logout()" style="margin-left: auto;">Logout</button>
                 </div>
             </header>
 
@@ -85,70 +87,122 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Initialize LogiGate Dashboard
+        // ============================================================================
+        // INITIALIZE DASHBOARD
+        // ============================================================================
+
         async function initDashboard() {
             try {
-                // Check authentication
+                console.log('Initializing LogiGate dashboard...');
+
+                // Step 1: Check if user is authenticated
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+
+                if (sessionError || !session) {
+                    console.warn('No active session, redirecting to login');
+                    redirectToLogin();
+                    return;
+                }
+
+                console.log('Session found, checking user...');
+
+                // Step 2: Get current user details
                 const user = await checkAuth();
+                
                 if (!user) {
-                    showAuthFailed();
+                    console.warn('User not authenticated');
+                    redirectToLogin();
                     return;
                 }
 
-                // Check if user has LogiGate access
+                console.log('User authenticated:', user.name);
+
+                // Step 3: Check LogiGate access
                 const hasAccess = await checkLogigateAccess(user.client_id);
+                
                 if (!hasAccess) {
+                    console.warn('User does not have LogiGate access');
                     showAuthFailed();
                     return;
                 }
 
-                // Fetch company info
-                const company = await getCompanyInfo(user.client_id);
+                console.log('User has LogiGate access');
+
+                // Step 4: Fetch company info
+                const company = await getClientInfo(user.client_id);
                 if (company) {
                     document.getElementById('company-name').textContent = company.business_name;
-                    document.getElementById('company-logo').src = company.logo_url;
+                    if (company.logo_url) {
+                        document.getElementById('company-logo').src = company.logo_url;
+                    }
                 }
 
-                // Show dashboard
+                // Step 5: Show dashboard
                 document.getElementById('auth-loading').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+
+                console.log('Dashboard initialized successfully');
+
             } catch (error) {
                 console.error('Dashboard init error:', error);
-                showAuthFailed();
+                redirectToLogin();
             }
         }
 
-        // Open Module
+        // ============================================================================
+        // REDIRECT TO LOGIN
+        // ============================================================================
+
+        function redirectToLogin() {
+            console.log('Redirecting to login page...');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================================================
+        // SHOW AUTH FAILED
+        // ============================================================================
+
+        function showAuthFailed() {
+            document.getElementById('auth-loading').style.display = 'none';
+            document.getElementById('auth-failed').style.display = 'block';
+        }
+
+        // ============================================================================
+        // LOGOUT
+        // ============================================================================
+
+        async function logout() {
+            try {
+                console.log('Logging out...');
+                const { error } = await supabaseClient.auth.signOut();
+                
+                if (error) {
+                    console.error('Logout error:', error);
+                }
+
+                console.log('User logged out, redirecting to login');
+                redirectToLogin();
+
+            } catch (error) {
+                console.error('Logout error:', error);
+                redirectToLogin();
+            }
+        }
+
+        // ============================================================================
+        // OPEN MODULE
+        // ============================================================================
+
         function openModule(moduleName) {
             if (moduleName === 'outbound-manifest') {
                 window.location.href = 'modules/outbound-manifest.html';
             }
         }
 
-        // Show Auth Failed
-        function showAuthFailed() {
-            document.getElementById('auth-loading').style.display = 'none';
-            document.getElementById('auth-failed').style.display = 'block';
-        }
+        // ============================================================================
+        // PAGE LOAD
+        // ============================================================================
 
-        // Get Company Info from Supabase
-        async function getCompanyInfo(clientId) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('clients')
-                    .select('id, business_name, logo_url, client_code')
-                    .eq('id', clientId)
-                    .single();
-
-                if (error) throw error;
-                return data;
-            } catch (error) {
-                console.error('Error fetching company info:', error);
-                return null;
-            }
-        }
-
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
