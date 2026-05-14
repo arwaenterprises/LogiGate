@@ -1,88 +1,440 @@
-// ============================================================================
-// CHECK AUTHENTICATION (From localStorage session)
-// ============================================================================
-
-async function checkAuth() {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        
-        if (!sessionData) {
-            console.warn('No session found');
-            return null;
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiGate Login - Warehouse Security</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        const session = JSON.parse(sessionData);
-        return session.user;
-
-    } catch (error) {
-        console.error('Auth check error:', error);
-        return null;
-    }
-}
-
-// ============================================================================
-// CHECK LOGIGATE ACCESS
-// ============================================================================
-
-async function checkLogigateAccess(clientId) {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        
-        if (!sessionData) {
-            return false;
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        const session = JSON.parse(sessionData);
-        const subscribedApps = session.client.subscribed_apps || [];
-        const hasAccess = subscribedApps.includes('logigate');
-
-        console.log('LogiGate access:', hasAccess);
-        return hasAccess;
-
-    } catch (error) {
-        console.error('Access check error:', error);
-        return false;
-    }
-}
-
-// ============================================================================
-// GET CLIENT INFO
-// ============================================================================
-
-async function getClientInfo(clientId) {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        
-        if (!sessionData) {
-            return null;
+        body {
+            background: linear-gradient(135deg, #5B4B9E 0%, #3E5BDB 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        const session = JSON.parse(sessionData);
-        return session.client;
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 420px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
 
-    } catch (error) {
-        console.error('Error fetching client:', error);
-        return null;
-    }
-}
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-// ============================================================================
-// LOGOUT
-// ============================================================================
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-async function logout() {
-    try {
-        console.log('Logging out...');
-        localStorage.removeItem('logigate_session');
-        window.location.href = 'login.html';
-    } catch (error) {
-        console.error('Logout error:', error);
-        window.location.href = 'login.html';
-    }
-}
+        .login-logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
 
-// Supabase Client (for database queries only)
-const SUPABASE_URL = 'https://kyktwzwiraipwyglkhva.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5a3R3endpcmFpcHd5Z2xraHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NDYxMzMsImV4cCI6MTg2OTQxNDEzM30.oPZGP3MWZc6kAU4_Kc8t-EX-gZST8h-B2Nt-AqcFPww';
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        .login-subtitle {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5B4B9E;
+            box-shadow: 0 0 0 3px rgba(91, 75, 158, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #cbd5e0;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #5B4B9E 0%, #3E5BDB 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(91, 75, 158, 0.3);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #f56565;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.3s ease-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .help-text {
+            background: #edf2f7;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .login-title {
+                font-size: 20px;
+            }
+
+            .login-logo {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Header -->
+        <div class="login-header">
+            <div class="login-logo">🛡️</div>
+            <h1 class="login-title">LogiGate</h1>
+            <p class="login-subtitle">Warehouse Security & Manifest Tracking</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="error-message">
+            <strong>Login Failed</strong>
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <!-- Client Code -->
+            <div class="form-group">
+                <label for="client-code">Client Code</label>
+                <input 
+                    type="text" 
+                    id="client-code" 
+                    placeholder="e.g., AE1, AE2, AE3"
+                    required
+                    autocomplete="off"
+                    style="text-transform: uppercase;"
+                >
+            </div>
+
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="login-button" id="login-btn">
+                <div class="login-button-content">
+                    <span class="loading-spinner" id="loading-spinner"></span>
+                    <span id="btn-text">Sign In</span>
+                </div>
+            </button>
+        </form>
+
+        <!-- Help Text -->
+        <div class="help-text" style="margin-top: 20px;">
+            <strong>Support:</strong><br>
+            Email: connect.arwaenterprises@gmail.com
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p>&copy; 2026 LogiGate by Arwa Enterprises</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://kyktwzwiraipwyglkhva.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5a3R3endpcmFpcHd5Z2xraHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NDYxMzMsImV4cCI6MTg2OTQxNDEzM30.oPZGP3MWZc6kAU4_Kc8t-EX-gZST8h-B2Nt-AqcFPww';
+
+        // Initialize Supabase Client
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================================================
+        // LOGIN HANDLER - CLIENT CODE + USERNAME + PASSWORD
+        // ============================================================================
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const clientCode = document.getElementById('client-code').value.trim().toUpperCase();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const btnText = document.getElementById('btn-text');
+            const errorDiv = document.getElementById('error-message');
+
+            // Hide error message
+            errorDiv.classList.remove('show');
+
+            // Disable button & show loading
+            loginBtn.disabled = true;
+            loadingSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Signing in...';
+
+            try {
+                console.log('Login attempt - Client:', clientCode, 'Username:', username);
+
+                // Step 1: Lookup client by client_code
+                const { data: clientData, error: clientError } = await supabaseClient
+                    .from('clients')
+                    .select('id, business_name, logo_url, subscribed_apps, client_code')
+                    .eq('client_code', clientCode)
+                    .single();
+
+                if (clientError || !clientData) {
+                    throw new Error('Client code not found');
+                }
+
+                console.log('Client found:', clientData.business_name);
+
+                // Step 2: Check if LogiGate is subscribed for this client
+                const subscribedApps = clientData.subscribed_apps || [];
+                if (!subscribedApps.includes('logigate')) {
+                    throw new Error('LogiGate is not available for this client');
+                }
+
+                console.log('LogiGate access confirmed for client');
+
+                // Step 3: Lookup user by username AND client_id
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('admin_users')
+                    .select('id, username, name, role, client_id, status, password_hash')
+                    .eq('username', username)
+                    .eq('client_id', clientData.id)
+                    .single();
+
+                if (userError || !userData) {
+                    throw new Error('Username not found for this client');
+                }
+
+                console.log('User found:', userData.name);
+
+                // Step 4: Verify password
+                if (userData.password_hash !== password) {
+                    throw new Error('Invalid password');
+                }
+
+                if (userData.status !== 'active') {
+                    throw new Error('User account is inactive');
+                }
+
+                console.log('Password verified, user active');
+
+                // Step 5: Create session in localStorage
+                const sessionData = {
+                    client_id: clientData.id,
+                    client_code: clientData.client_code,
+                    business_name: clientData.business_name,
+                    logo_url: clientData.logo_url,
+                    username: userData.username,
+                    name: userData.name,
+                    user_id: userData.id,
+                    role: userData.role,
+                    status: userData.status,
+                    subscribed_apps: subscribedApps,
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('logigate_session', JSON.stringify(sessionData));
+                console.log('Session created - Client:', clientCode);
+
+                // Step 6: Redirect to dashboard
+                showSuccess('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Login failed. Please try again.');
+                
+                // Re-enable button
+                loginBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                btnText.textContent = 'Sign In';
+            }
+        }
+
+        // ============================================================================
+        // ERROR/SUCCESS HANDLING
+        // ============================================================================
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorDiv.style.background = '#c6f6d5';
+            errorDiv.style.color = '#22543d';
+            errorDiv.style.borderLeftColor = '#48bb78';
+            errorDiv.querySelector('strong').textContent = 'Success';
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        // ============================================================================
+        // CHECK IF ALREADY LOGGED IN
+        // ============================================================================
+
+        function checkExistingSession() {
+            const sessionData = localStorage.getItem('logigate_session');
+            if (sessionData) {
+                console.log('Existing session found, redirecting to dashboard');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Check on page load
+        document.addEventListener('DOMContentLoaded', checkExistingSession);
+
+        // Auto-focus on client code field
+        document.getElementById('client-code').focus();
+    </script>
+</body>
+</html>
