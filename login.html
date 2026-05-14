@@ -286,8 +286,9 @@
         const SUPABASE_URL = 'https://kyktwzwiraipwyglkhva.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5a3R3endpcmFpcHd5Z2xraHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NDYxMzMsImV4cCI6MTg2OTQxNDEzM30.oPZGP3MWZc6kAU4_Kc8t-EX-gZST8h-B2Nt-AqcFPww';
 
-        // Initialize Supabase Client
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        /// NEW - Uses service role key (bypasses RLS for login only)
+const SUPABASE_SERVICE_KEY = 'YOUR_SERVICE_ROLE_KEY_HERE';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
         // ============================================================================
         // LOGIN HANDLER - CLIENT CODE + USERNAME + PASSWORD
