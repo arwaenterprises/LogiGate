@@ -537,11 +537,17 @@
         let currentUser = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            currentUser = await checkAuth();
-            if (!currentUser) {
-                window.location.href = '../index.html';
-                return;
-            }
+    currentUser = await checkAuth();
+    console.log('Current user:', currentUser);
+    if (!currentUser) {
+        console.warn('No user, redirecting to index');
+        window.location.href = '../index.html';
+        return;
+    }
+    console.log('User authenticated, initializing manifest page');
+    initSignaturePad();
+    loadManifests();
+});
             initSignaturePad();
             loadManifests();
         });
