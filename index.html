@@ -1,115 +1,110 @@
-// ============================================================================
-// LogiGate Auth Module (DEMO MODE)
-// Uses localStorage session - no Supabase Auth
-// ============================================================================
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiGate - Warehouse Security</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="loading-state" class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading LogiGate...</p>
+        </div>
 
-// Supabase Client (for database queries only)
-const SUPABASE_URL = 'https://kyktwzwiraipwyglkhva.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5a3R3endpcmFpcHd5Z2xraHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NDYxMzMsImV4cCI6MTg2OTQxNDEzM30.oPZGP3MWZc6kAU4_Kc8t-EX-gZST8h-B2Nt-AqcFPww';
+        <div id="dashboard" style="display: none;">
+            <header class="logigate-header">
+                <div class="header-content">
+                    <div class="company-section">
+                        <img src="https://ak.com.sa/img/logos/AkLogo2.png" alt="Company Logo" class="company-logo">
+                        <h1 class="company-name">Al Abdul Kareem (Demo)</h1>
+                    </div>
+                </div>
+            </header>
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            <main class="dashboard-main">
+                <section class="dashboard-intro">
+                    <h2>LogiGate Modules</h2>
+                    <p>Warehouse Security & Manifest Tracking</p>
+                </section>
 
-// ============================================================================
-// CHECK AUTHENTICATION (From localStorage session)
-// ============================================================================
+                <section class="modules-grid">
+                    <div class="module-card active" onclick="openModule('outbound-manifest')">
+                        <div class="module-icon">🛡️</div>
+                        <h3>Outbound Manifest</h3>
+                        <p>Track shipments handed over to transporters</p>
+                        <span class="module-status live">● LIVE</span>
+                    </div>
 
-async function checkAuth() {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        
-        if (!sessionData) {
-            console.warn('No session found');
-            return null;
+                    <div class="module-card disabled">
+                        <div class="module-icon">📦</div>
+                        <h3>Inbound Receipt</h3>
+                        <p>Log incoming containers and shipments</p>
+                        <span class="module-status coming">Coming Soon</span>
+                    </div>
+
+                    <div class="module-card disabled">
+                        <div class="module-icon">👥</div>
+                        <h3>Visitor Management</h3>
+                        <p>Check-in/out and visitor tracking</p>
+                        <span class="module-status coming">Coming Soon</span>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="dashboard-footer">
+                <p>&copy; 2026 LogiGate by Arwa Enterprises. Demo Mode - Standalone Testing</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        async function initDashboard() {
+            try {
+                console.log('Initializing LogiGate in DEMO MODE...');
+
+                const demoSession = {
+                    client_id: '0b19805c-5ea6-4172-b493-d8c345e2c92d',
+                    client_code: 'AE3',
+                    business_name: 'Al Abdul Kareem',
+                    logo_url: 'https://ak.com.sa/img/logos/AkLogo2.png',
+                    username: 'demo_user',
+                    name: 'Demo User',
+                    user_id: 'demo_user_id',
+                    role: 'guard',
+                    status: 'active',
+                    subscribed_apps: ['logigate'],
+                    timestamp: new Date().toISOString(),
+                    demo_mode: true
+                };
+
+                localStorage.setItem('logigate_session', JSON.stringify(demoSession));
+                console.log('Demo session created');
+
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+
+                console.log('Dashboard initialized successfully - DEMO MODE');
+
+            } catch (error) {
+                console.error('Dashboard init error:', error);
+                document.getElementById('loading-state').innerHTML = '<h2 style="color: white;">Error: ' + error.message + '</h2>';
+            }
         }
 
-        const session = JSON.parse(sessionData);
-        return session;
-
-    } catch (error) {
-        console.error('Auth check error:', error);
-        return null;
-    }
-}
-
-// ============================================================================
-// CHECK LOGIGATE ACCESS
-// ============================================================================
-
-async function checkLogigateAccess(clientId) {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        
-        if (!sessionData) {
-            return false;
+        function openModule(moduleName) {
+            if (moduleName === 'outbound-manifest') {
+                window.location.href = 'modules/outbound-manifest.html';
+            }
         }
 
-        const session = JSON.parse(sessionData);
-        const subscribedApps = session.subscribed_apps || [];
-        const hasAccess = subscribedApps.includes('logigate');
-
-        console.log('LogiGate access:', hasAccess);
-        return hasAccess;
-
-    } catch (error) {
-        console.error('Access check error:', error);
-        return false;
-    }
-}
-
-// ============================================================================
-// GET CLIENT INFO
-// ============================================================================
-
-async function getClientInfo(clientId) {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        
-        if (!sessionData) {
-            return null;
-        }
-
-        const session = JSON.parse(sessionData);
-        return {
-            id: session.client_id,
-            business_name: session.business_name,
-            logo_url: session.logo_url,
-            subscribed_apps: session.subscribed_apps
-        };
-
-    } catch (error) {
-        console.error('Error fetching client:', error);
-        return null;
-    }
-}
-
-// ============================================================================
-// LOGOUT
-// ============================================================================
-
-async function logout() {
-    try {
-        console.log('Logging out...');
-        localStorage.removeItem('logigate_session');
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error('Logout error:', error);
-        window.location.href = 'index.html';
-    }
-}
-
-// ============================================================================
-// GET CURRENT USER
-// ============================================================================
-
-async function getCurrentUser() {
-    try {
-        const sessionData = localStorage.getItem('logigate_session');
-        if (!sessionData) return null;
-        
-        const session = JSON.parse(sessionData);
-        return session;
-    } catch (error) {
-        console.error('Get user error:', error);
-        return null;
-    }
-}
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
