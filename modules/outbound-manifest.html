@@ -54,11 +54,6 @@
             border-bottom-color: #5B4B9E;
         }
 
-        .manifest-tab:hover {
-            color: #5B4B9E;
-        }
-
-        /* Form Section */
         .form-section {
             background: white;
             border-radius: 12px;
@@ -115,19 +110,6 @@
         .form-group textarea {
             resize: vertical;
             min-height: 80px;
-        }
-
-        /* Photo Upload */
-        .photo-upload-group {
-            grid-column: 1 / -1;
-        }
-
-        .photo-upload-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 12px;
-            display: block;
         }
 
         .photo-upload-container {
@@ -187,12 +169,6 @@
             background: #f7fafc;
         }
 
-        /* Signature Canvas */
-        .signature-section {
-            grid-column: 1 / -1;
-            margin-bottom: 20px;
-        }
-
         .signature-canvas {
             border: 1px solid #cbd5e0;
             border-radius: 6px;
@@ -225,14 +201,6 @@
             color: #5B4B9E;
         }
 
-        /* Buttons */
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-            grid-column: 1 / -1;
-        }
-
         .btn {
             padding: 12px 24px;
             border: none;
@@ -263,45 +231,13 @@
             background: #cbd5e0;
         }
 
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 12px;
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            grid-column: 1 / -1;
         }
 
-        /* Camera/Barcode Buttons */
-        .capture-button {
-            background: #4299e1;
-            color: white;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .capture-button:hover {
-            background: #3182ce;
-        }
-
-        .scan-button {
-            background: #48bb78;
-            color: white;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .scan-button:hover {
-            background: #38a169;
-        }
-
-        /* List Section */
         .list-section {
             background: white;
             border-radius: 12px;
@@ -339,12 +275,6 @@
             font-size: 14px;
         }
 
-        .search-bar input:focus {
-            outline: none;
-            border-color: #5B4B9E;
-        }
-
-        /* Table */
         .manifest-table {
             width: 100%;
             border-collapse: collapse;
@@ -381,9 +311,6 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-        }
-
-        .status-pending {
             background: #fef3c7;
             color: #92400e;
         }
@@ -402,25 +329,15 @@
             transition: all 0.3s;
         }
 
-        .action-btn-view {
-            background: #bee3f8;
-            color: #2c5282;
-        }
-
         .action-btn-download {
             background: #c6f6d5;
             color: #22543d;
-        }
-
-        .action-btn-view:hover {
-            background: #90cdf4;
         }
 
         .action-btn-download:hover {
             background: #9ae6b4;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -433,7 +350,6 @@
             color: #2d3748;
         }
 
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -466,22 +382,6 @@
             }
         }
 
-        /* Loading Spinner */
-        .spinner {
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #5B4B9E;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mobile Responsive */
         @media (max-width: 768px) {
             .manifest-container {
                 padding: 15px;
@@ -499,85 +399,54 @@
             .search-bar {
                 min-width: auto;
             }
-
-            .manifest-table {
-                font-size: 12px;
-            }
-
-            .manifest-table th,
-            .manifest-table td {
-                padding: 10px 8px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="manifest-container">
-        <!-- Header -->
         <div class="manifest-header">
             <h1>🛡️ Outbound Manifest</h1>
             <p>Log shipments handed over to transporters with signatures and photo evidence</p>
         </div>
 
-        <!-- Tabs -->
         <div class="manifest-tabs">
             <button class="manifest-tab active" onclick="switchTab('form')">New Manifest</button>
             <button class="manifest-tab" onclick="switchTab('list')">All Manifests</button>
         </div>
 
-        <!-- FORM TAB -->
         <div id="form-tab" class="tab-content">
             <div class="form-section">
                 <div class="form-title">Manifest Details</div>
-                
                 <div class="form-grid">
-                    <!-- Manifest Number -->
                     <div class="form-group">
                         <label>Manifest Number *</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="manifest-number" placeholder="e.g., MNF-2026-001" required>
-                            <button class="scan-button" onclick="scanBarcode()">📱 Scan</button>
-                        </div>
+                        <input type="text" id="manifest-number" placeholder="e.g., MNF-2026-001" required>
                     </div>
-
-                    <!-- Item Count -->
                     <div class="form-group">
                         <label>Item Count *</label>
                         <input type="number" id="item-count" placeholder="0" min="1" required>
                     </div>
-
-                    <!-- Notes -->
                     <div class="form-group">
                         <label>Notes (Optional)</label>
                         <textarea id="notes" placeholder="Additional notes..."></textarea>
                     </div>
                 </div>
 
-                <!-- Warehouse Staff Section -->
                 <div class="form-title">Warehouse Staff</div>
                 <div class="form-grid">
-                    <!-- Staff Name -->
                     <div class="form-group">
                         <label>Staff Name *</label>
                         <input type="text" id="staff-name" placeholder="Enter staff name" required>
                     </div>
-
-                    <!-- Staff Photo -->
                     <div class="form-group">
                         <label>Staff Photo *</label>
-                        <button class="capture-button" onclick="captureStaffPhoto()" style="width: 100%;">📷 Capture Photo</button>
-                    </div>
-
-                    <div class="form-group" style="display: none;" id="staff-photo-preview-group">
-                        <label>Photo Preview</label>
-                        <img id="staff-photo-preview" src="" alt="Staff Photo" style="max-width: 200px; border-radius: 6px;">
+                        <button class="btn btn-secondary" onclick="captureStaffPhoto()" style="width: 100%;">📷 Capture Photo</button>
                     </div>
                 </div>
 
-                <!-- Staff Signature -->
                 <div class="form-title">Staff Signature</div>
                 <div class="form-grid">
-                    <div class="form-group signature-section">
+                    <div class="form-group" style="grid-column: 1 / -1;">
                         <label>Sign below *</label>
                         <canvas id="signature-canvas" class="signature-canvas"></canvas>
                         <div class="signature-controls">
@@ -587,42 +456,29 @@
                     </div>
                 </div>
 
-                <!-- Manifest Pages -->
                 <div class="form-title">Manifest Pages (Photos)</div>
                 <div class="form-grid">
-                    <div class="photo-upload-group">
-                        <label class="photo-upload-label">Upload manifest pages (Convert to PDF) *</label>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Upload manifest pages (Convert to PDF) *</label>
                         <div class="photo-upload-container" id="manifest-pages-container">
-                            <button class="photo-upload-btn" onclick="document.getElementById('manifest-pages-input').click()">
-                                ➕
-                            </button>
+                            <button class="photo-upload-btn" onclick="document.getElementById('manifest-pages-input').click()">➕</button>
                             <input type="file" id="manifest-pages-input" multiple accept="image/*" style="display: none;" onchange="addManifestPages(event)">
                         </div>
                     </div>
                 </div>
 
-                <!-- Transporter Section -->
                 <div class="form-title">Transporter Details</div>
                 <div class="form-grid">
-                    <!-- Transporter Name -->
                     <div class="form-group">
                         <label>Transporter Name *</label>
                         <input type="text" id="transporter-name" placeholder="Enter transporter name" required>
                     </div>
-
-                    <!-- Transporter Photo -->
                     <div class="form-group">
                         <label>Transporter Photo *</label>
-                        <button class="capture-button" onclick="captureTransporterPhoto()" style="width: 100%;">📷 Capture Photo</button>
-                    </div>
-
-                    <div class="form-group" style="display: none;" id="transporter-photo-preview-group">
-                        <label>Photo Preview</label>
-                        <img id="transporter-photo-preview" src="" alt="Transporter Photo" style="max-width: 200px; border-radius: 6px;">
+                        <button class="btn btn-secondary" onclick="captureTransporterPhoto()" style="width: 100%;">📷 Capture Photo</button>
                     </div>
                 </div>
 
-                <!-- Buttons -->
                 <div class="form-grid">
                     <div class="button-group">
                         <button class="btn btn-primary" onclick="submitManifest()">✓ Create Manifest</button>
@@ -632,14 +488,12 @@
             </div>
         </div>
 
-        <!-- LIST TAB -->
         <div id="list-tab" class="tab-content" style="display: none;">
             <div class="list-section">
                 <div class="list-header">
                     <h2>All Manifests</h2>
                     <div class="search-bar">
                         <input type="text" id="search-input" placeholder="Search by manifest number..." onkeyup="searchManifests()">
-                        <input type="date" id="filter-date" onchange="filterByDate()">
                     </div>
                 </div>
 
@@ -656,7 +510,6 @@
                         </tr>
                     </thead>
                     <tbody id="manifest-tbody">
-                        <!-- Rows populated by JS -->
                     </tbody>
                 </table>
 
@@ -668,44 +521,31 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../lib/signature_pad.min.js"></script>
-    <script src="../lib/html2pdf.min.js"></script>
-    <script src="../lib/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/manifest-api.js"></script>
     <script src="../js/barcode-scanner.js"></script>
 
     <script>
-        // Global Variables
         let signaturePad = null;
         let staffPhotoBlob = null;
         let transporterPhotoBlob = null;
         let manifestPagesBlobs = [];
         let currentUser = null;
-        let currentCompany = null;
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check auth
             currentUser = await checkAuth();
             if (!currentUser) {
                 window.location.href = '../index.html';
                 return;
             }
-
-            // Fetch company info
-            currentCompany = await fetchCompanyInfo(currentUser.client_id);
-
-            // Initialize signature pad
             initSignaturePad();
-
-            // Load manifest list
             loadManifests();
         });
 
-        // Initialize Signature Pad
         function initSignaturePad() {
             const canvas = document.getElementById('signature-canvas');
             signaturePad = new SignaturePad(canvas, {
@@ -714,23 +554,12 @@
                 minWidth: 2,
                 maxWidth: 3,
             });
-
-            // Handle window resize
-            window.addEventListener('resize', () => {
-                const canvas = document.getElementById('signature-canvas');
-                const rect = canvas.getBoundingClientRect();
-                canvas.width = rect.width;
-                canvas.height = rect.height;
-                signaturePad.fromData(signaturePad.toData());
-            });
         }
 
-        // Clear Signature
         function clearSignature() {
             signaturePad.clear();
         }
 
-        // Undo Signature
         function undoSignature() {
             const data = signaturePad.toData();
             if (data.length > 0) {
@@ -739,31 +568,22 @@
             }
         }
 
-        // Capture Staff Photo
         async function captureStaffPhoto() {
             const file = await capturePhoto();
             if (file) {
                 staffPhotoBlob = file;
-                const preview = URL.createObjectURL(file);
-                document.getElementById('staff-photo-preview').src = preview;
-                document.getElementById('staff-photo-preview-group').style.display = 'block';
                 showToast('Staff photo captured', 'success');
             }
         }
 
-        // Capture Transporter Photo
         async function captureTransporterPhoto() {
             const file = await capturePhoto();
             if (file) {
                 transporterPhotoBlob = file;
-                const preview = URL.createObjectURL(file);
-                document.getElementById('transporter-photo-preview').src = preview;
-                document.getElementById('transporter-photo-preview-group').style.display = 'block';
                 showToast('Transporter photo captured', 'success');
             }
         }
 
-        // Capture Photo (Camera or File)
         function capturePhoto() {
             return new Promise((resolve) => {
                 const input = document.createElement('input');
@@ -772,52 +592,26 @@
                 input.capture = 'environment';
                 input.onchange = (e) => {
                     const file = e.target.files[0];
-                    if (file) {
-                        resolve(file);
-                    }
+                    if (file) resolve(file);
                 };
                 input.click();
             });
         }
 
-        // Add Manifest Pages
         function addManifestPages(event) {
             const files = event.target.files;
             const container = document.getElementById('manifest-pages-container');
-
             for (let file of files) {
                 manifestPagesBlobs.push(file);
-                
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const div = document.createElement('div');
-                    div.className = 'photo-preview';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" alt="Manifest Page">
-                        <button class="remove-btn" onclick="removeManifestPage(this)">✕</button>
-                    `;
-                    container.insertBefore(div, container.firstChild.nextSibling);
-                };
-                reader.readAsDataURL(file);
             }
             showToast(`${files.length} page(s) added`, 'success');
         }
 
-        // Remove Manifest Page
-        function removeManifestPage(btn) {
-            const index = Array.from(btn.parentElement.parentElement.children).indexOf(btn.parentElement) - 1;
-            manifestPagesBlobs.splice(index, 1);
-            btn.parentElement.remove();
-        }
-
-        // Submit Manifest
         async function submitManifest() {
-            // Validate
-            const manifestNumber = document.getElementById('manifest-number').value;
-            const staffName = document.getElementById('staff-name').value;
+            const manifestNumber = document.getElementById('manifest-number').value.trim();
+            const staffName = document.getElementById('staff-name').value.trim();
             const itemCount = document.getElementById('item-count').value;
-            const transporterName = document.getElementById('transporter-name').value;
+            const transporterName = document.getElementById('transporter-name').value.trim();
 
             if (!manifestNumber || !staffName || !itemCount || !transporterName) {
                 showToast('Please fill all required fields', 'error');
@@ -844,30 +638,24 @@
                 return;
             }
 
+            showToast('Creating manifest...', 'info');
+            
+            const manifestData = {
+                manifest_number: manifestNumber,
+                warehouse_staff_name: staffName,
+                warehouse_staff_photo: staffPhotoBlob,
+                warehouse_staff_signature: signaturePad.toData(),
+                manifest_pages: manifestPagesBlobs,
+                transporter_name: transporterName,
+                transporter_photo: transporterPhotoBlob,
+                item_count: parseInt(itemCount),
+                notes: document.getElementById('notes').value,
+                client_id: currentUser.client_id,
+                guard_id: currentUser.user_id
+            };
+
             try {
-                // Show loading
-                const btn = event.target;
-                btn.disabled = true;
-                btn.textContent = '⏳ Creating...';
-
-                // Create manifest
-                const manifestData = {
-                    manifest_number: manifestNumber,
-                    warehouse_staff_name: staffName,
-                    warehouse_staff_photo: staffPhotoBlob,
-                    warehouse_staff_signature: signaturePad.toData(),
-                    manifest_pages: manifestPagesBlobs,
-                    transporter_name: transporterName,
-                    transporter_photo: transporterPhotoBlob,
-                    item_count: parseInt(itemCount),
-                    notes: document.getElementById('notes').value,
-                    client_id: currentUser.client_id,
-                    guard_id: currentUser.id,
-                    company: currentCompany
-                };
-
                 const result = await createManifest(manifestData);
-                
                 if (result.success) {
                     showToast('Manifest created successfully!', 'success');
                     resetForm();
@@ -875,16 +663,11 @@
                 } else {
                     showToast(result.error || 'Failed to create manifest', 'error');
                 }
-
-                btn.disabled = false;
-                btn.textContent = '✓ Create Manifest';
             } catch (error) {
-                console.error('Submit error:', error);
-                showToast('Error creating manifest', 'error');
+                showToast('Error: ' + error.message, 'error');
             }
         }
 
-        // Reset Form
         function resetForm() {
             document.getElementById('manifest-number').value = '';
             document.getElementById('staff-name').value = '';
@@ -894,30 +677,14 @@
             staffPhotoBlob = null;
             transporterPhotoBlob = null;
             manifestPagesBlobs = [];
-            document.getElementById('staff-photo-preview-group').style.display = 'none';
-            document.getElementById('transporter-photo-preview-group').style.display = 'none';
             signaturePad.clear();
-            document.getElementById('manifest-pages-input').value = '';
-
-            // Clear preview container
-            const container = document.getElementById('manifest-pages-container');
-            while (container.children.length > 1) {
-                container.removeChild(container.children[1]);
-            }
         }
 
-        // Load Manifests
         async function loadManifests() {
-            try {
-                const manifests = await getManifests(currentUser.client_id);
-                displayManifests(manifests);
-            } catch (error) {
-                console.error('Load error:', error);
-                showToast('Error loading manifests', 'error');
-            }
+            const manifests = await getManifests(currentUser.client_id);
+            displayManifests(manifests);
         }
 
-        // Display Manifests
         function displayManifests(manifests) {
             const tbody = document.getElementById('manifest-tbody');
             const emptyState = document.getElementById('empty-state');
@@ -936,10 +703,9 @@
                     <td>${m.transporter_name}</td>
                     <td>${m.item_count}</td>
                     <td>${new Date(m.created_at).toLocaleDateString()}</td>
-                    <td><span class="status-badge status-pending">Logged</span></td>
+                    <td><span class="status-badge">Logged</span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn action-btn-view" onclick="viewManifest('${m.id}')">View</button>
                             <button class="action-btn action-btn-download" onclick="downloadPDF('${m.id}')">PDF</button>
                         </div>
                     </td>
@@ -947,7 +713,6 @@
             `).join('');
         }
 
-        // Search Manifests
         function searchManifests() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const rows = document.querySelectorAll('#manifest-tbody tr');
@@ -957,76 +722,32 @@
             });
         }
 
-        // Filter by Date
-        function filterByDate() {
-            // Implementation for date filter
-        }
-
-        // View Manifest
-        async function viewManifest(id) {
-            showToast('Loading manifest details...', 'success');
-            // Implementation for modal/detail view
-        }
-
-        // Download PDF
         async function downloadPDF(id) {
             try {
-                const btn = event.target;
-                btn.disabled = true;
-                btn.textContent = '⏳...';
-
                 const result = await generateAndDownloadPDF(id, currentUser.client_id);
-                
                 if (result.success) {
                     showToast('PDF downloaded', 'success');
                 } else {
-                    showToast('Failed to generate PDF', 'error');
+                    showToast('Failed to download PDF', 'error');
                 }
-
-                btn.disabled = false;
-                btn.textContent = 'PDF';
             } catch (error) {
-                console.error('PDF error:', error);
-                showToast('Error generating PDF', 'error');
+                showToast('Error: ' + error.message, 'error');
             }
         }
 
-        // Fetch Company Info
-        async function fetchCompanyInfo(clientId) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('clients')
-                    .select('id, business_name, logo_url')
-                    .eq('id', clientId)
-                    .single();
-
-                if (error) throw error;
-                return data;
-            } catch (error) {
-                console.error('Error fetching company:', error);
-                return null;
-            }
-        }
-
-        // Switch Tab
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.manifest-tab').forEach(t => t.classList.remove('active'));
-            
             document.getElementById(tab + '-tab').style.display = 'block';
             event.target.classList.add('active');
         }
 
-        // Show Toast
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         }
     </script>
 </body>
